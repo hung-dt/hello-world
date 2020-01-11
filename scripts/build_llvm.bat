@@ -1,5 +1,5 @@
 @echo off
-SET ver=6.0.1
+SET ver=8.0.0
 
 rem Check if cmake can be found
 where cmake >nul 2>&1
@@ -41,13 +41,13 @@ echo Building LLVM %ver%
 set cwd=%cd%
 set llvm=llvm-%ver%
 set llvmsrc=llvm-%ver%.src
-
-rem goto :build
+set llvm_url=http://releases.llvm.org/%ver%
+rem set llvm_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-%ver%/
 
 :extract
 if not exist %llvmsrc%.tar.xz (
     echo Downloading %llvmsrc%.tar.xz ...
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('http://releases.llvm.org/%ver%/%llvmsrc%.tar.xz', '%llvmsrc%.tar.xz')" || exit /B 1
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%llvmsrc%.tar.xz', '%llvmsrc%.tar.xz')" || exit /B 1
 )
 echo *** Extracting %llvmsrc%.tar.xz ...
 7z x %llvmsrc%.tar.xz -so | 7z x -aoa -si -ttar
@@ -59,7 +59,7 @@ if %errorlevel% neq 0 (
 set srcfile=cfe-%ver%.src
 if not exist %srcfile%.tar.xz (
     echo Downloading %srcfile%.tar.xz ...
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('http://releases.llvm.org/%ver%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || exit /B 1
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || exit /B 1
 )
 echo *** Extracting %srcfile% to %llvmsrc%\tools\ ...
 7z x %srcfile%.tar.xz -so | 7z x -aoa -si -ttar -o"%llvmsrc%\tools"
@@ -67,12 +67,12 @@ if %errorlevel% neq 0 (
     echo Error: Failed to extract %srcfile%.tar.xz!
     exit /B 1
 )
-move %llvmsrc%\tools\%srcfile% %llvmrc%\tools\clang
+rename %llvmsrc%\tools\%srcfile% clang || exit /B 1
 
 set srcfile=clang-tools-extra-%ver%.src
 if not exist %srcfile%.tar.xz (
     echo Downloading %srcfile%.tar.xz ...
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('http://releases.llvm.org/%ver%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || exit /B 1
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || exit /B 1
 )
 echo *** Extracting %srcfile%.tar.xz to %llvmrc%\tools\clang\tools\ ...
 7z x %srcfile%.tar.xz -so | 7z x -aoa -si -ttar -o"%llvmsrc%\tools\clang\tools"
@@ -80,12 +80,12 @@ if %errorlevel% neq 0 (
     echo Error: Failed to extract %srcfile%.tar.xz!
     exit /B 1
 )
-move %llvmsrc%\tools\clang\tools\%srcfile% %llvmrc%\tools\clang\tools\extra
+rename %llvmsrc%\tools\clang\tools\%srcfile% extra || exit /B 1
 
 set srcfile=lld-%ver%.src
 if not exist %srcfile%.tar.xz (
     echo Downloading %srcfile%.tar.xz ...
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('http://releases.llvm.org/%ver%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || exit /B 1
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || exit /B 1
 )
 echo *** Extracting %srcfile%.tar.xz to %llvmrc%\tools\ ...
 7z x %srcfile%.tar.xz -so | 7z x -aoa -si -ttar -o"%llvmsrc%\tools"
@@ -93,7 +93,7 @@ if %errorlevel% neq 0 (
     echo Error: Failed to extract %srcfile%.tar.xz!
     exit /B 1
 )
-move %llvmsrc%\tools\%srcfile% %llvmrc%\tools\lld
+rename %llvmsrc%\tools\%srcfile% lld || exit /B 1
 
 :build
 set llvmdir=%cd%\%llvmsrc%
@@ -116,6 +116,7 @@ cmake %llvmdir% -G Ninja ^
 -DLLVM_ENABLE_RTTI=ON ^
 -DCMAKE_C_COMPILER=gcc ^
 -DCMAKE_CXX_COMPILER=g++ ^
+-DCMAKE_CXX_FLAGS=-std=c++14 ^
 -DGCC_INSTALL_PREFIX=%gccpath% ^
 -DCMAKE_INSTALL_PREFIX=%installpath% ^
 -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++ -static -lstdc++ -lpthread" ^
