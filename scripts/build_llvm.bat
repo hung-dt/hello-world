@@ -1,99 +1,93 @@
+:: Name    : build_llvm.bat
+:: Purpose : Build LLVM in Windows using MinGW
+:: Author  : dotuanhung@gmail.com
+:: Revision:
+
 @echo off
-SET ver=8.0.0
 
 rem Check if cmake can be found
-where cmake >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Error: cmake not found!
-    exit /B 1
-)
+where cmake >nul 2>&1 || ( echo ERROR: cmake not found! && exit /B 1 )
 
 rem Check if ninja can be found
-where ninja >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Error: ninja not found!
-    exit /B 1
-)
+where ninja >nul 2>&1 || ( echo ERROR: ninja not found! && exit /B 1 )
 
 rem Check if python can be found
-where python >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Error: python not found!
-    exit /B 1
-)
+where python >nul 2>&1 || ( echo ERROR: python not found! && exit /B 1 )
 
 rem Check if g++ can be found
-where g++ >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Error: g++ not found!
-    exit /B 1
-)
+where g++ >nul 2>&1 || ( echo ERROR: g++ not found! && exit /B 1 )
 
 rem Check if 7z can be found
-where 7z >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Error: 7z not found!
-    exit /B 1
-)
+where 7z >nul 2>&1 || ( echo ERROR: 7z not found! && exit /B 1 )
 
-echo Building LLVM %ver%
+set ver=7.0.1
+set llvm_url=http://releases.llvm.org/%ver%
+rem set llvm_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-%ver%/
 
 set cwd=%cd%
 set llvm=llvm-%ver%
 set llvmsrc=llvm-%ver%.src
-set llvm_url=http://releases.llvm.org/%ver%
-rem set llvm_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-%ver%/
+
+echo INFO: Building LLVM %ver%
+
+rem All are done in subdirectory llvm-%ver% of the current directory
+mkdir %llvm%
+cd %llvm%
 
 :extract
 if not exist %llvmsrc%.tar.xz (
     echo Downloading %llvmsrc%.tar.xz ...
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%llvmsrc%.tar.xz', '%llvmsrc%.tar.xz')" || exit /B 1
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%llvmsrc%.tar.xz', '%llvmsrc%.tar.xz')" || ( cd %cwd% && exit /B 1 )
+    echo.  Done!
 )
-echo *** Extracting %llvmsrc%.tar.xz ...
+echo INFO: Extracting %llvmsrc%.tar.xz ...
 7z x %llvmsrc%.tar.xz -so | 7z x -aoa -si -ttar
 if %errorlevel% neq 0 (
-    echo Error: Failed to extract %llvmsrc%.tar.xz!
-    exit /B 1
+    echo ERROR: Failed to extract %llvmsrc%.tar.xz!
+    cd %cwd% && exit /B 1
 )
 
 set srcfile=cfe-%ver%.src
 if not exist %srcfile%.tar.xz (
     echo Downloading %srcfile%.tar.xz ...
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || exit /B 1
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || ( cd %cwd% && exit /B 1 )
+    echo.  Done!
 )
-echo *** Extracting %srcfile% to %llvmsrc%\tools\ ...
+echo INFO: Extracting %srcfile% to %llvmsrc%\tools\ ...
 7z x %srcfile%.tar.xz -so | 7z x -aoa -si -ttar -o"%llvmsrc%\tools"
 if %errorlevel% neq 0 (
-    echo Error: Failed to extract %srcfile%.tar.xz!
-    exit /B 1
+    echo ERROR: Failed to extract %srcfile%.tar.xz!
+    cd %cwd% && exit /B 1
 )
-rename %llvmsrc%\tools\%srcfile% clang || exit /B 1
+rename %llvmsrc%\tools\%srcfile% clang || ( cd %cwd% && exit /B 1 )
 
 set srcfile=clang-tools-extra-%ver%.src
 if not exist %srcfile%.tar.xz (
     echo Downloading %srcfile%.tar.xz ...
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || exit /B 1
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || ( cd %cwd% && exit /B 1 )
+    echo.  Done!
 )
-echo *** Extracting %srcfile%.tar.xz to %llvmrc%\tools\clang\tools\ ...
+echo INFO: Extracting %srcfile%.tar.xz to %llvmrc%\tools\clang\tools\ ...
 7z x %srcfile%.tar.xz -so | 7z x -aoa -si -ttar -o"%llvmsrc%\tools\clang\tools"
 if %errorlevel% neq 0 (
-    echo Error: Failed to extract %srcfile%.tar.xz!
-    exit /B 1
+    echo ERROR: Failed to extract %srcfile%.tar.xz!
+    cd %cwd% && exit /B 1
 )
-rename %llvmsrc%\tools\clang\tools\%srcfile% extra || exit /B 1
+rename %llvmsrc%\tools\clang\tools\%srcfile% extra || ( cd %cwd% && exit /B 1 )
 
 set srcfile=lld-%ver%.src
 if not exist %srcfile%.tar.xz (
     echo Downloading %srcfile%.tar.xz ...
-    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || exit /B 1
+    powershell -Command "(New-Object Net.WebClient).DownloadFile('%llvm_url%/%srcfile%.tar.xz', '%srcfile%.tar.xz')" || ( cd %cwd% && exit /B 1 )
+    echo.  Done!
 )
-echo *** Extracting %srcfile%.tar.xz to %llvmrc%\tools\ ...
+echo INFO: Extracting %srcfile%.tar.xz to %llvmrc%\tools\ ...
 7z x %srcfile%.tar.xz -so | 7z x -aoa -si -ttar -o"%llvmsrc%\tools"
 if %errorlevel% neq 0 (
-    echo Error: Failed to extract %srcfile%.tar.xz!
-    exit /B 1
+    echo ERROR: Failed to extract %srcfile%.tar.xz!
+    cd %cwd% && exit /B 1
 )
-rename %llvmsrc%\tools\%srcfile% lld || exit /B 1
+rename %llvmsrc%\tools\%srcfile% lld || ( cd %cwd% && exit /B 1 )
 
 :build
 set llvmdir=%cd%\%llvmsrc%
@@ -102,8 +96,8 @@ set installpath=D:\Dev\Tools\LLVM
 
 echo LLVM source dir: %llvmdir%
 
-mkdir _build\%llvm%_static_win64
-cd _build\%llvm%_static_win64
+mkdir _build_static_win64
+cd _build_static_win64
 
 cmake %llvmdir% -G Ninja ^
 -DCMAKE_BUILD_TYPE=Release ^
@@ -128,5 +122,9 @@ cmake --build .
 
 strip bin\*.exe
 
-:cleanup
+rem make install
+
+:end
 cd %cwd%
+echo on
+@exit /B 0
