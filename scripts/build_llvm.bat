@@ -91,7 +91,8 @@ rename %llvmsrc%\tools\%srcfile% lld || ( cd %cwd% && exit /B 1 )
 
 :build
 set llvmdir=%cd%\%llvmsrc%
-set gccpath=D:\Dev\Tools\MinGW
+for /f %%i in ('where g++') do set RESULT=%%i
+set gccpath=%RESULT:~0,-7%
 set installpath=D:\Dev\Tools\LLVM
 
 echo LLVM source dir: %llvmdir%
