@@ -28,6 +28,29 @@ make install
 ```
 export LD_LIBRARY_PATH=$HOME/opt/SFML-2.5.1/lib:$LD_LIBRARY_PATH
 ```
+- Create an environment variable `SFML_HOME` set to `$HOME/opt/SFML-2.5.1`
+```
+export SFML_HOME=$HOME/opt/SFML-2.5.1
+```
+## Compile and install SFML-2.5.1 in Windows using MinGW
+- Download SFML source: [https://www.sfml-dev.org/files/SFML-2.5.1-sources.zip]
+- Compile with cmake and install to `D:\Dev\sfml-2.5.1`
+```
+cd <SFML_source_dir>
+mkdir build && cd build
+cmake .. -G Ninja ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_INSTALL_PREFIX=D:\Dev\sfml-2.5.1 ^
+-DBUILD_SHARED_LIBS=ON ^
+-DSFML_BUILD_EXAMPLES=OFF
+ninja -j 8
+cmake --build . --target install
+```
+- Add `D:\Dev\sfml-2.5.1\bin` to %PATH% so dynamic libs can be found:
+- Create an environment variable `SFML_HOME` set to `D:\Dev\sfml-2.5.1`
+```
+setx SFML_HOME D:\Dev\sfml-2.5.1
+```
 
 ## Compile a sample SFML app with cmake
 - Create a sample SFML app:
