@@ -23,7 +23,8 @@ The following tools are needed for our development setup.
 ### Git for Windows
 - Download [PortableGit-2.25.0](https://github.com/git-for-windows/git/releases/download/v2.25.0.windows.1/PortableGit-2.25.0-64-bit.7z.exe) to `\Dev\Temp`
 - Run the downloaded file to install it to `\Dev\Tools\PortableGit`
-- Add `\Dev\Tools\PortableGit\usr\bin` to `%PATH%`
+- If extract manually, must run `\Dev\Tools\PortableGit\post_install.bat`
+- Add `\Dev\Tools\PortableGit\usr\bin` and `\Dev\Tools\PortableGit\mingw64\bin` to `%PATH%`
 
 ### MinGW-W64 GCC-8.1.0
 - Download [MinGW-W64 GCC-8.1.0 x86_64, POSIX thread, seh runtime](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z/download) to `\Dev\Temp`
