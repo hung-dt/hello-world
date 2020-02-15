@@ -44,3 +44,13 @@ The following tools are needed for our development setup.
 
 ### Compile Clang (optional)
 Compile Clang using MinGW, cmake and ninja.
+
+## Configure Visual Studio Code
+### Add git bash terminal
+Add the following line to `settings.json`
+```json
+    // Git Bash
+    "terminal.integrated.shell.windows": "C:\\Dev\\Tools\\PortableGit\\bin\\bash.exe",
+    // Open the terminal in the currently opened file's directory
+    "terminal.integrated.cwd": "${fileDirname}"
+```
