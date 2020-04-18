@@ -9,6 +9,24 @@
   - [Test imgui-sfml](#test-imgui-sfml)
 - [Compile and install spdlog (header only lib)](#compile-and-install-spdlog-header-only-lib)
 
+## Notes about install folders
+
+All libraries can be installed to `prefix` directory which will be populated as below:
+```
+<prefix-dir>
+    bin/          --> binary/dll files
+    include/      --> header files
+    lib/          --> static libs
+        cmake/    --> cmake config files
+```
+For example, `prefix-dir` is `D:\Dev\opt` then sfml will be installed to:
+```
+  D:\Dev\opt
+            bin\            --> dll files
+            include\SFML    --> header files
+            lib\cmake\SFML  --> cmake config files
+```
+
 ## Compile SFML-2.5.1 in Linux Mint 19.3
 - Download SFML source
 - Install dependencies:
@@ -247,8 +265,9 @@ mkdir build && cd build
 
 cmake .. -G Ninja ^
 -DCMAKE_BUILD_TYPE=Release ^
--DCMAKE_INSTALL_PREFIX=D:\Dev\Tools\spdlog-1.5.0 ^
--DSPDLOG_BUILD_EXAMPLES=Off
+-DCMAKE_INSTALL_PREFIX=D:\Dev\opt ^
+-DSPDLOG_BUILD_EXAMPLE=OFF ^
+-DSPDLOG_BUILD_TESTS=OFF
 
 cmake --build . --target install
 ```
