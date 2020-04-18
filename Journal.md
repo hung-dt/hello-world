@@ -270,6 +270,10 @@ cmake .. -G Ninja ^
 -DSPDLOG_BUILD_TESTS=OFF
 
 cmake --build . --target install
+
+-- D:\Dev\opt\include\spdlog
+-- D:\Dev\opt\lib
+-- D:\Dev\opt\lib\cmake\spdlog
 ```
 
 To use just `#include "spdlog/spdlog.h"`
@@ -304,4 +308,28 @@ find_package(spdlog REQUIRED)
 
 add_executable(spdlog_test spdlog_test.cpp)
 target_link_libraries(spdlog_test PRIVATE spdlog::spdlog_header_only)
+```
+
+## docopt.cpp
+
+Download [docopt.cpp 0.6.2](https://github.com/docopt/docopt.cpp/tree/v0.6.2) and extract to `D:\Dev\tmp`
+
+Compile and install:
+```
+cd D:\Dev\tmp\docopt.cpp-0.6.2
+mkdir build && cd build
+
+cmake .. -G Ninja ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_INSTALL_PREFIX=D:\Dev\opt ^
+-DWITH_TESTS=OFF ^
+-DWITH_EXAMPLE=OFF
+
+ninja -j 8
+
+cmake --build . --target install
+
+-- D:\Dev\opt\lib
+-- D:\Dev\opt\include\docopt
+-- D:\Dev\opt\lib\cmake\docopt
 ```
