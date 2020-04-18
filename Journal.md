@@ -1,5 +1,14 @@
 # My Journal
 
+- [Compile SFML-2.5.1 in Linux Mint 19.3](#compile-sfml-251-in-linux-mint-193)
+- [Compile and install SFML-2.5.1 in Windows using MinGW](#compile-and-install-sfml-251-in-windows-using-mingw)
+- [Compile a sample SFML app with cmake](#compile-a-sample-sfml-app-with-cmake)
+- [Compile SFML app manually](#compile-sfml-app-manually)
+- [Compile and install imgui-sfml](#compile-and-install-imgui-sfml)
+  - [Config imgui-sfml](#config-imgui-sfml)
+  - [Test imgui-sfml](#test-imgui-sfml)
+- [Compile and install spdlog (header only lib)](#compile-and-install-spdlog-header-only-lib)
+
 ## Compile SFML-2.5.1 in Linux Mint 19.3
 - Download SFML source
 - Install dependencies:
@@ -134,4 +143,146 @@ g++ test.cpp -o sfml-app -L<sfml-install-path>/lib -lsfml-graphics -lsfml-window
 If SFML is not installed in a standard path, you need to tell the dynamic linker where to find the SFML libraries first by specifying LD_LIBRARY_PATH:
 ```
 export LD_LIBRARY_PATH=<sfml-install-path>/lib
+```
+
+## Compile and install imgui-sfml
+
+Download [imgui-sfml 2.1](https://github.com/eliasdaler/imgui-sfml/tree/v2.1) and extract to `D:\Dev\tmp`
+
+Download [imgui 1.76](https://github.com/ocornut/imgui/tree/v1.76) and extract to `D:\Dev\tmp`
+
+
+```
+cd D:\Dev\tmp\imgui-sfml-2.1
+mkdir build && cd build
+
+cmake .. -G Ninja ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_INSTALL_PREFIX=D:\Dev\Tools\imgui-sfml-2.1 ^
+-DIMGUI_DIR=D:\Dev\tmp\imgui-1.76 ^
+-DSFML_DIR=D:\Dev\sfml-2.5.1 ^
+-DBUILD_SHARED_LIBS=ON ^
+-DIMGUI_SFML_BUILD_EXAMPLES=OFF
+
+ninja -j 8
+
+cmake --build . --target install
+```
+
+imgui-sfml will be built as shared lib and installed to `D:\Dev\Tools\imgui-sfml-2.1`
+
+### Config imgui-sfml
+
+Add `D:\Dev\Tools\imgui-sfml-2.1\bin` to %PATH% env so that dynamic libs can be found when program runs.
+
+### Test imgui-sfml
+
+Sample program:
+```cpp
+#include "imgui.h"
+#include "imgui-SFML.h"
+
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+
+int main()
+{
+  sf::RenderWindow window(sf::VideoMode(640, 480), "ImGui + SFML = <3");
+  window.setFramerateLimit(60);
+  ImGui::SFML::Init(window);
+
+  sf::CircleShape shape(100.f);
+  shape.setFillColor(sf::Color::Green);
+
+  sf::Clock deltaClock;
+  while (window.isOpen())
+  {
+    sf::Event event;
+    while (window.pollEvent(event))
+    {
+      ImGui::SFML::ProcessEvent(event);
+
+      if (event.type == sf::Event::Closed)
+      {
+        window.close();
+      }
+    }
+
+    ImGui::SFML::Update(window, deltaClock.restart());
+
+    ImGui::Begin("Hello, world!");
+    ImGui::Button("Look at this pretty button");
+    ImGui::End();
+
+    window.clear();
+    window.draw(shape);
+    ImGui::SFML::Render(window);
+    window.display();
+  }
+
+  ImGui::SFML::Shutdown();
+}
+```
+
+Create CMakeLists.txt:
+```
+set(ImGui-SFML_DIR "D:/Dev/Tools/imgui-sfml-2.1/lib/cmake/ImGui-SFML")
+find_package(ImGui-SFML REQUIRED)
+
+add_executable(test_imgui main.cpp)
+target_link_libraries(test_imgui PRIVATE ImGui-SFML::ImGui-SFML)
+```
+
+## Compile and install spdlog (header only lib)
+
+Download [spdlog-1.5.0](https://github.com/gabime/spdlog/tree/v1.5.0) and extract to `D:\Dev\Tools`
+
+Compile and install:
+
+```
+cd D:\Dev\tmp\spdlog-1.5.0
+mkdir build && cd build
+
+cmake .. -G Ninja ^
+-DCMAKE_BUILD_TYPE=Release ^
+-DCMAKE_INSTALL_PREFIX=D:\Dev\Tools\spdlog-1.5.0 ^
+-DSPDLOG_BUILD_EXAMPLES=Off
+
+cmake --build . --target install
+```
+
+To use just `#include "spdlog/spdlog.h"`
+
+Sample program:
+```cpp
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
+
+int main()
+{
+
+  spdlog::info("Sample Info output.");
+  spdlog::warn("Sample Warn output.");
+  spdlog::error("Sample Error output.");
+
+  auto filelog = spdlog::basic_logger_mt("sample-logger", "sample-log.txt");
+
+  filelog.get()->info("Sample Info output.");
+  filelog.get()->warn("Sample Warn output.");
+  filelog.get()->error("Sample Error output.");
+
+  return 0;
+}
+```
+
+CMakeLists.txt
+```
+# spdlog
+set(spdlog_DIR "D:/Dev/Tools/spdlog-1.5.0/lib/cmake/spdlog")
+find_package(spdlog REQUIRED)
+
+add_executable(spdlog_test spdlog_test.cpp)
+target_link_libraries(spdlog_test PRIVATE spdlog::spdlog_header_only)
 ```
