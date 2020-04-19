@@ -1,17 +1,30 @@
 # My Journal
 
+- [CMake Build Types](#cmake-build-types)
+- [Notes about install folders](#notes-about-install-folders)
 - [Compile SFML-2.5.1 in Linux Mint 19.3](#compile-sfml-251-in-linux-mint-193)
 - [Compile and install SFML-2.5.1 in Windows using MinGW](#compile-and-install-sfml-251-in-windows-using-mingw)
 - [Compile a sample SFML app with cmake](#compile-a-sample-sfml-app-with-cmake)
 - [Compile SFML app manually](#compile-sfml-app-manually)
 - [Compile and install imgui-sfml](#compile-and-install-imgui-sfml)
-  - [Config imgui-sfml](#config-imgui-sfml)
   - [Test imgui-sfml](#test-imgui-sfml)
 - [Compile and install spdlog (header only lib)](#compile-and-install-spdlog-header-only-lib)
+- [docopt.cpp](#docoptcpp)
+
+## CMake Build Types
+
+C++ flags used for each `CMAKE_BUILD_TYPE`
+
+| CMAKE_BUILD_TYPE | C++ flags (GCC/Clang) |
+|------------------|-----------------------|
+| Debug            | `-g`                  |
+| RelWithDebInfo   | `-O2 -g -DNDEBUG`     |
+| Release          | `-O3 -DNDEBUG`        |
+| MinSizeRel       | `-Os -DNDEBUG`        |
 
 ## Notes about install folders
 
-All libraries can be installed to `prefix` directory which will be populated as below:
+All libraries can be installed to `prefix-dir` directory which will be populated as below:
 ```
 <prefix-dir>
     bin/          --> binary/dll files
@@ -21,10 +34,15 @@ All libraries can be installed to `prefix` directory which will be populated as 
 ```
 For example, `prefix-dir` is `D:\Dev\opt` then sfml will be installed to:
 ```
-  D:\Dev\opt
+  D:\Dev\opt\
             bin\            --> dll files
             include\SFML    --> header files
             lib\cmake\SFML  --> cmake config files
+```
+
+CMake uses `CMAKE_INSTALL_PREFIX` to specify install folder when configuring:
+```
+cmake -DCMAKE_INSTALL_PREFIX=D:\Dev\opt
 ```
 
 ## Compile SFML-2.5.1 in Linux Mint 19.3
@@ -176,7 +194,7 @@ mkdir build && cd build
 
 cmake .. -G Ninja ^
 -DCMAKE_BUILD_TYPE=Release ^
--DCMAKE_INSTALL_PREFIX=D:\Dev\Tools\imgui-sfml-2.1 ^
+-DCMAKE_INSTALL_PREFIX=D:\Dev\opt ^
 -DIMGUI_DIR=D:\Dev\tmp\imgui-1.76 ^
 -DSFML_DIR=D:\Dev\sfml-2.5.1 ^
 -DBUILD_SHARED_LIBS=ON ^
@@ -185,13 +203,14 @@ cmake .. -G Ninja ^
 ninja -j 8
 
 cmake --build . --target install
+
+-- Install to:
+-- D:\Dev\opt\bin           --> dll
+-- D:\Dev\opt\include       --> header files
+-- D:\Dev\opt\lib\cmake\ImGui-SFML
 ```
 
-imgui-sfml will be built as shared lib and installed to `D:\Dev\Tools\imgui-sfml-2.1`
-
-### Config imgui-sfml
-
-Add `D:\Dev\Tools\imgui-sfml-2.1\bin` to %PATH% env so that dynamic libs can be found when program runs.
+imgui-sfml will be built as shared lib and installed to `D:\Dev\opt`
 
 ### Test imgui-sfml
 
@@ -246,7 +265,7 @@ int main()
 
 Create CMakeLists.txt:
 ```
-set(ImGui-SFML_DIR "D:/Dev/Tools/imgui-sfml-2.1/lib/cmake/ImGui-SFML")
+set(ImGui-SFML_DIR "D:/Dev/opt/lib/cmake/ImGui-SFML")
 find_package(ImGui-SFML REQUIRED)
 
 add_executable(test_imgui main.cpp)
@@ -271,6 +290,7 @@ cmake .. -G Ninja ^
 
 cmake --build . --target install
 
+-- Install to:
 -- D:\Dev\opt\include\spdlog
 -- D:\Dev\opt\lib
 -- D:\Dev\opt\lib\cmake\spdlog
@@ -329,6 +349,7 @@ ninja -j 8
 
 cmake --build . --target install
 
+-- Install to:
 -- D:\Dev\opt\lib
 -- D:\Dev\opt\include\docopt
 -- D:\Dev\opt\lib\cmake\docopt
