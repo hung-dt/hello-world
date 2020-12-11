@@ -51,6 +51,17 @@ Update:
 ### Compile Clang (optional)
 Compile Clang using MinGW, cmake and ninja.
 
+## Download Specific Version of VSCode
+
+Use the following URL to download .zip version of VSCode:
+```
+https://vscode-update.azurewebsites.net/<download version>/win32-x64-archive/stable
+```
+
+For example, to download version 1.49.3 the download link is: `https://vscode-update.azurewebsites.net/1.49.3/win32-x64-archive/stable`
+
+Visit [VSCode updates](https://code.visualstudio.com/updates) for more info.
+
 ## Configure Visual Studio Code
 ### Add git bash terminal
 Add the following line to `settings.json`
@@ -60,3 +71,8 @@ Add the following line to `settings.json`
     // Open the terminal in the currently opened file's directory
     "terminal.integrated.cwd": "${fileDirname}"
 ```
+
+### Install C/C++ extension
+
+## Format C/C++ source files with clang-format
+
