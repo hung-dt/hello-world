@@ -31,6 +31,12 @@ The following tools are needed for our development setup.
 - Extract to `\Dev\Tools\mingw64`
 - Add `\Dev\Tools\mingw64\bin` to `%PATH%`
 
+Update:
+[WinLibs](http://winlibs.com/) provides better builds of GCC and MinGW-w64 for Windows
+- Download [WinLibs x86_64, GCC 10.2.0, POSIX thread SEH, LLVM 10.0.1, MinGW-w64 7.0.0_r4](https://github.com/brechtsanders/winlibs_mingw/releases/download/10.2.0-7.0.0-r4/winlibs-x86_64-posix-seh-gcc-10.2.0-llvm-10.0.1-mingw-w64-7.0.0-r4.7z) to `\Dev\Temp`
+- Extract to `\Dev\Tools`
+- Add `\Dev\Tools\mingw64\bin` to `%PATH%`
+
 ### CMake
 - Download [CMake 3.16.4](https://github.com/Kitware/CMake/releases/download/v3.16.4/cmake-3.16.4-win64-x64.zip) to `\Dev\Temp`
 - Extract to `\Dev\Tools\cmake-3.16.4`
